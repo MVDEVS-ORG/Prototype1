@@ -50,15 +50,12 @@ public class Enemy : MonoBehaviour
     {
         if (_isFollowiongCommand)
         {
-            if (_isFollowiongCommand)
+            if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
             {
-                if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+                if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
                 {
-                    if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
-                    {
-                        _isFollowiongCommand = false;
-                        _followPlayer = true;
-                    }
+                    _isFollowiongCommand = false;
+                    _followPlayer = true;
                 }
             }
         }
