@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
+[RequireComponent(typeof(SphereCollider))]
 public class ArtilliaryPrefabScript : MonoBehaviour
 {
     private Vector3 _startPos;
@@ -17,6 +18,7 @@ public class ArtilliaryPrefabScript : MonoBehaviour
         _endPos = pos;
         _upperCoordinate = (_endPos - _startPos) / 2;
         _upperCoordinate.y = _upperCoordinate.y + Vector3.Magnitude(_endPos - _startPos) * 2;
+        StartCoroutine(Move());
     }
 
     IEnumerator Move()
@@ -30,7 +32,11 @@ public class ArtilliaryPrefabScript : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         _endOfMovement = true;
+        _collider.enabled = true;
     }
 
-
+    private void OnCollisionEnter(Collision collision)
+    {
+        //check for enemy;
+    }
 }

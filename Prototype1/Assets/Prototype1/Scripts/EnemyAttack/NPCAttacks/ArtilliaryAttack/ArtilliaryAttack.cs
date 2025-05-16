@@ -5,7 +5,6 @@ using UnityEngine;
 public class ArtilliaryAttack : MonoBehaviour, INPCAttack
 {
     [SerializeField] GameObject _attackPrefab;
-    [SerializeField] 
     public void Attack(Vector3 pos)
     {
         StartCoroutine(AttackUsingShell(pos));
