@@ -1,29 +1,29 @@
-using prototype1.scripts.attacks;
+using prototype1.scripts.systems;
 using System.Collections;
 using UnityEngine;
 
-public class ArtilliaryAttack : MonoBehaviour, INPCAttack
+namespace prototype1.scripts.attacks
 {
-    [SerializeField] GameObject _attackPrefab;
-    public void Attack(Vector3 pos)
+    [RequireComponent(typeof(HealthSystem))]
+    public class ArtilliaryAttack : MonoBehaviour, INPCAttack
     {
-        StartCoroutine(AttackUsingShell(pos));
-    }
+        [SerializeField] ArtilliaryPrefabScript _attackPrefab;
+        IHealthSystem _healthSystem;    
+        public void Attack(IHealthSystem enemy)
+        {
+            StartCoroutine(AttackUsingShell((enemy as HealthSystem).transform.position));
+        }
 
-    void Start()
-    {
-        
-    }
+        void Start()
+        {
+            _healthSystem = GetComponent<HealthSystem>();
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    IEnumerator AttackUsingShell(Vector3 pos)
-    {
-        GameObject attack = Instantiate(_attackPrefab, transform);
-        yield return null;
+        IEnumerator AttackUsingShell(Vector3 pos)
+        {
+            ArtilliaryPrefabScript attack = Instantiate(_attackPrefab.gameObject, transform.position, Quaternion.identity).GetComponent<ArtilliaryPrefabScript>();
+            attack.SetParameters(pos, _healthSystem.CharacterType);
+            yield return null;
+        }
     }
 }

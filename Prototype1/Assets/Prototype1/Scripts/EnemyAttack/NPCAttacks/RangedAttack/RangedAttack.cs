@@ -5,10 +5,10 @@ using UnityEngine;
 namespace prototype1.scripts.attacks
 {
     [RequireComponent(typeof(HealthSystem))]
-    public class MeleeAttack : MonoBehaviour, INPCAttack
+    public class RangedAttack : MonoBehaviour, INPCAttack
     {
         [Range(0, 2)][SerializeField] float _animationTime;
-        [SerializeField] AttackPrefabScript _attackPrefab;
+        [SerializeField] RangedAttackPrefabScript _attackPrefab;
         Coroutine _attackCoroutine;
         IHealthSystem _healthSystem;
 
@@ -23,16 +23,17 @@ namespace prototype1.scripts.attacks
             {
                 return;
             }
-            _attackCoroutine = StartCoroutine(AttackUsingMelee());
+            _attackCoroutine = StartCoroutine(AttackUsingRanged(enemy));
         }
 
-        IEnumerator AttackUsingMelee()
+        IEnumerator AttackUsingRanged(IHealthSystem enemy)
         {
-            AttackPrefabScript attack = Instantiate(_attackPrefab.gameObject, transform).GetComponent<AttackPrefabScript>();
-            attack.SetCharacterType(_healthSystem.CharacterType);
+            RangedAttackPrefabScript attack = Instantiate(_attackPrefab.gameObject, transform).GetComponent<RangedAttackPrefabScript>();
             yield return new WaitForSeconds(_animationTime);
+            attack.DamageEnemy(enemy);
             Destroy(attack.gameObject);
             _attackCoroutine = null;
         }
+
     }
 }

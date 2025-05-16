@@ -1,9 +1,16 @@
-using UnityEngine;
+using prototype1.scripts.systems;
 
 namespace prototype1.scripts.attacks
 {
     public interface INPCAttack
     {
-        void Attack(Vector3 pos);
+        void Attack(IHealthSystem enemy);
+    }
+
+    public enum CharacterType
+    {
+        Player,
+        AlliedNPC,
+        EnemyNPC
     }
 }
