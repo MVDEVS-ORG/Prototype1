@@ -1,2 +1,12 @@
 fileFormatVersion: 2
 guid: 41c333f232ff9f84db9d11c5971f007f
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - _attackPrefab: {fileID: 1019865969240432199, guid: d4aa2c1db9857ed4daafd29a239c98f3, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
