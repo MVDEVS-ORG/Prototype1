@@ -16,19 +16,18 @@ public class Troop : MonoBehaviour
 {
     public TroopType type;
     public float attackRange;
-    public float damage;
     public float mobility; // movement speed
     public Color defaultColor = Color.white;
     public Color selectedColor = Color.green;
-    public int maxHealth = 100;
-    public int attackDamage = 10;
+    public float detectDistance;
+    public float attackCooldown;
 
     private NavMeshAgent _agent;
     private Renderer _rend;
-    private bool _isSelected = false;
+    public bool _isSelected = false;
     private GameObject _targetEnemy;
-    private int _currentHealth;
     private INPCAttack _npcAttack;
+    private float _lastAttackTime = 0f;
 
     public CharacterType CharacterType => CharacterType.AlliedNPC;
 
@@ -46,7 +45,6 @@ public class Troop : MonoBehaviour
         _rend = GetComponent<Renderer>();
         _npcAttack = GetComponent<INPCAttack>();
         _rend.material.color = defaultColor;
-        _currentHealth = maxHealth;
         ApplyStatsByType();
     }
 
@@ -63,13 +61,13 @@ public class Troop : MonoBehaviour
         switch (type)
         {
             case TroopType.Gunner:
-                attackRange = 5f; damage = 10f; mobility = 6f;
+                attackRange = 50f; mobility = 6f;
                 break;
             case TroopType.Sniper:
-                attackRange = 15f; damage = 15f; mobility = 3f;
+                attackRange = 100f; mobility = 3f;
                 break;
             case TroopType.Artillery:
-                attackRange = 12f; damage = 30f; mobility = 2f;
+                attackRange = 150f; mobility = 2f;
                 break;
         }
         _agent.speed = mobility;
@@ -97,7 +95,7 @@ public class Troop : MonoBehaviour
 
     private void AcquireAndAttack()
     {
-        Collider[] hits = Physics.OverlapSphere(transform.position, attackRange, LayerMask.GetMask("Enemy"));
+        Collider[] hits = Physics.OverlapSphere(transform.position, detectDistance, LayerMask.GetMask("Enemy"));
         if (hits.Length > 0)
         {
             float minDist = float.MaxValue;
@@ -106,20 +104,26 @@ public class Troop : MonoBehaviour
                 float d = Vector3.Distance(transform.position, hit.transform.position);
                 if (d < minDist) { minDist = d; _targetEnemy = hit.gameObject; }
             }
-            if (_targetEnemy != null)
+            if (_targetEnemy != null && _targetEnemy.TryGetComponent(out IHealthSystem enemy))
             {
                 _agent.SetDestination(_targetEnemy.transform.position);
-                //TODO: stop Troop according to their attack Range
+                if (minDist < attackRange)
+                {
+                    _agent.isStopped = true;
+                    if (Time.time > (_lastAttackTime + attackCooldown))
+                    {
+                        Debug.LogError("Reached");
+                        _npcAttack.Attack(enemy);
+                        _lastAttackTime = Time.time; 
+                    }
+                }
+                else
+                {
+                    _agent.isStopped = false;
+                    _agent.SetDestination(_targetEnemy.transform.position);
+                }
                 if (minDist <= 1.5f) _npcAttack.Attack(_targetEnemy.GetComponent<IHealthSystem>());
             }
         }
     }
-    private void Die()
-    {
-        Debug.Log("Troop Died");
-        _agent.isStopped = true;
-
-        Destroy(gameObject);
-    }
-
 }

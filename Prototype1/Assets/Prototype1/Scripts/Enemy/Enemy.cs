@@ -26,7 +26,6 @@ public class Enemy : MonoBehaviour
     public float detectionRange = 15f;
     public float attackRange = 2f;
     public float attackCooldown = 1.5f;
-    public float maxHealth = 100f;
 
     private NavMeshAgent agent;
     private float _lastAttackTime;
@@ -38,8 +37,6 @@ public class Enemy : MonoBehaviour
     private bool _isReachedDestination;
     [SerializeField]
     private bool _isFollowiongCommand = false;
-    [SerializeField]
-    private float _currentHealth;
     private Vector3 _currentDestination;
     private INPCAttack _npcAttack;
 
@@ -47,8 +44,6 @@ public class Enemy : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         _npcAttack = GetComponent<INPCAttack>();
-        Debug.LogError($"Enemy npc Attack: {(_npcAttack != null)}");
-        _currentHealth = maxHealth;
     }
 
     private void Update()
@@ -71,14 +66,19 @@ public class Enemy : MonoBehaviour
 
             if (_isPlayerVisible && distanceToPlayer <= detectionRange)
             {
-                if (distanceToPlayer <= attackRange && Time.time > _lastAttackTime + attackCooldown)
+                if (distanceToPlayer <= attackRange)
                 {
-                    IHealthSystem playerHealthSystem = player.GetComponent<IHealthSystem>();
-                    _npcAttack.Attack(playerHealthSystem);
-                    _lastAttackTime = Time.time;
+                    if (Time.time > (_lastAttackTime + attackCooldown))
+                    {
+                        agent.isStopped = true;
+                        IHealthSystem playerHealthSystem = player.GetComponent<IHealthSystem>();
+                        _npcAttack.Attack(playerHealthSystem);
+                        _lastAttackTime = Time.time;
+                    }
                 }
                 else
                 {
+                    agent.isStopped = false;
                     agent.SetDestination(player.position);
                 }
             }
@@ -106,13 +106,5 @@ public class Enemy : MonoBehaviour
         _followPlayer = false;
         _currentDestination = position;
         agent.SetDestination(position);
-    }
-
-    private void Die()
-    {
-        Debug.Log("Enemy Died");
-        agent.isStopped = true;
-
-        Destroy(gameObject);
     }
 }
