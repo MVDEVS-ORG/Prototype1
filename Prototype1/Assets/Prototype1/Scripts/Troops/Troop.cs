@@ -12,7 +12,7 @@ public enum TroopType
 }
 
 [RequireComponent(typeof(NavMeshAgent))]
-public class Troop : MonoBehaviour, IHealthSystem
+public class Troop : MonoBehaviour
 {
     public TroopType type;
     public float attackRange;
@@ -21,12 +21,14 @@ public class Troop : MonoBehaviour, IHealthSystem
     public Color defaultColor = Color.white;
     public Color selectedColor = Color.green;
     public int maxHealth = 100;
+    public int attackDamage = 10;
 
     private NavMeshAgent _agent;
     private Renderer _rend;
     private bool _isSelected = false;
     private GameObject _targetEnemy;
     private int _currentHealth;
+    private INPCAttack _npcAttack;
 
     public CharacterType CharacterType => CharacterType.AlliedNPC;
 
@@ -42,6 +44,7 @@ public class Troop : MonoBehaviour, IHealthSystem
     {
         _agent = GetComponent<NavMeshAgent>();
         _rend = GetComponent<Renderer>();
+        _npcAttack = GetComponent<INPCAttack>();
         _rend.material.color = defaultColor;
         _currentHealth = maxHealth;
         ApplyStatsByType();
@@ -106,34 +109,10 @@ public class Troop : MonoBehaviour, IHealthSystem
             if (_targetEnemy != null)
             {
                 _agent.SetDestination(_targetEnemy.transform.position);
-                if (minDist <= 1.5f) Attack(_targetEnemy.GetComponent<IHealthSystem>());
+                //TODO: stop Troop according to their attack Range
+                if (minDist <= 1.5f) _npcAttack.Attack(_targetEnemy.GetComponent<IHealthSystem>());
             }
         }
-    }
-
-    void Attack(IHealthSystem enemyHealthSystem)
-    {
-        Debug.LogError("attacking");
-    }
-
-    public void TakeDamage(int damage)
-    {
-        _currentHealth -= damage;
-        if(_currentHealth <= 0)
-        {
-            Die();
-        }
-    }
-
-    public void RestoreHealth(int healing)
-    {
-        _currentHealth += healing;
-        if(_currentHealth > maxHealth) _currentHealth = maxHealth;
-    }
-
-    public void ResetHealth()
-    {
-        _currentHealth = maxHealth;
     }
     private void Die()
     {

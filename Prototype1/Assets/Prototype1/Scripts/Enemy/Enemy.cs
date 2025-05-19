@@ -12,7 +12,7 @@ public enum EnemyType
     Boss
 }
 
-public class Enemy : MonoBehaviour, IHealthSystem
+public class Enemy : MonoBehaviour
 {
     [Header("Enemy Type")]
     public EnemyType enemyType;
@@ -41,12 +41,14 @@ public class Enemy : MonoBehaviour, IHealthSystem
     [SerializeField]
     private float _currentHealth;
     private Vector3 _currentDestination;
-
-    public CharacterType CharacterType => CharacterType.EnemyNPC;
+    private IHealthSystem _healthSystem;
+    private INPCAttack _npcAttack;
 
     private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        _healthSystem = GetComponent<HealthSystem>();
+        _npcAttack = GetComponent<INPCAttack>();
         _currentHealth = maxHealth;
     }
 
@@ -73,7 +75,7 @@ public class Enemy : MonoBehaviour, IHealthSystem
                 if (distanceToPlayer <= attackRange && Time.time > _lastAttackTime + attackCooldown)
                 {
                     IHealthSystem playerHealthSystem = player.GetComponent<IHealthSystem>();
-                    Attack(playerHealthSystem);
+                    _npcAttack.Attack(playerHealthSystem);
                     _lastAttackTime = Time.time;
                 }
                 else
@@ -87,12 +89,6 @@ public class Enemy : MonoBehaviour, IHealthSystem
             }
         }
         
-    }
-
-    private void Attack(IHealthSystem opponentHealth)
-    {
-        Debug.Log("Enemy Attacks Player");
-        opponentHealth.TakeDamage(10);
     }
 
     private bool IsPlayerVisible(float distanceToPlayer)
@@ -113,33 +109,11 @@ public class Enemy : MonoBehaviour, IHealthSystem
         agent.SetDestination(position);
     }
 
-    public void TakeDamage(int amount)
-    {
-        _currentHealth -= amount;
-        Debug.Log($"Enemy Took Damage: {amount}");
-
-        if(_currentHealth <= 0)
-        {
-            Die();
-        }
-    }
-
     private void Die()
     {
         Debug.Log("Enemy Died");
         agent.isStopped = true;
 
         Destroy(gameObject);
-    }
-
-    public void RestoreHealth(int healing)
-    {
-        _currentHealth += healing;
-        if (_currentHealth > maxHealth) _currentHealth = maxHealth;
-    }
-
-    public void ResetHealth()
-    {
-        _currentHealth = maxHealth;
     }
 }
