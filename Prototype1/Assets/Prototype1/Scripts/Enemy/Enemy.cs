@@ -41,14 +41,13 @@ public class Enemy : MonoBehaviour
     [SerializeField]
     private float _currentHealth;
     private Vector3 _currentDestination;
-    private IHealthSystem _healthSystem;
     private INPCAttack _npcAttack;
 
     private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        _healthSystem = GetComponent<HealthSystem>();
         _npcAttack = GetComponent<INPCAttack>();
+        Debug.LogError($"Enemy npc Attack: {(_npcAttack != null)}");
         _currentHealth = maxHealth;
     }
 
