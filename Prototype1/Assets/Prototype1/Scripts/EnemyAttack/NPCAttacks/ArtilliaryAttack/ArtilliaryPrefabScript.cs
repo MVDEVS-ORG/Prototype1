@@ -20,7 +20,7 @@ public class ArtilliaryPrefabScript : MonoBehaviour
     {
         _startPos = transform.position;
         _endPos = pos;
-        _upperCoordinate = (_startPos-_endPos).normalized * Vector3.Distance(_startPos,_endPos)/2;
+        _upperCoordinate = Vector3.Lerp(_startPos, _endPos, 0.5f);
         _upperCoordinate.y = _upperCoordinate.y + Vector3.Distance(_startPos, _endPos)*2;
         Debug.DrawLine(_startPos, (_endPos - _startPos)/2, Color.green, 10f);
         Debug.DrawLine(_startPos, _upperCoordinate, Color.red, 10f);
@@ -39,11 +39,11 @@ public class ArtilliaryPrefabScript : MonoBehaviour
             Vector3 pointB = Vector3.Lerp(_upperCoordinate, _endPos, _timer);
             transform.position = Vector3.Lerp(pointA, pointB, _timer);
             _timer += Time.deltaTime/_time;
-            Debug.LogError(_timer);
             yield return new WaitForEndOfFrame();
         }
         _endOfMovement = true;
         _collider.enabled = true;
+        Destroy(gameObject,0.5f);
     }
 
     private void OnTriggerEnter(Collider other)

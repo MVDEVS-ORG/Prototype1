@@ -28,9 +28,10 @@ namespace prototype1.scripts.attacks
 
         IEnumerator AttackUsingRanged(IHealthSystem enemy)
         {
+            
             RangedAttackPrefabScript attack = Instantiate(_attackPrefab.gameObject, transform).GetComponent<RangedAttackPrefabScript>();
             yield return new WaitForSeconds(_animationTime);
-            attack.DamageEnemy(enemy);
+            attack.DamageEnemy(enemy, _healthSystem.CharacterType);
             Destroy(attack.gameObject);
             _attackCoroutine = null;
         }

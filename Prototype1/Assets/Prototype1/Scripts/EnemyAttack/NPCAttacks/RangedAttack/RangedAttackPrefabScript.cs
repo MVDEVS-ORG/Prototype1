@@ -4,12 +4,11 @@ using UnityEngine;
 
 public class RangedAttackPrefabScript : MonoBehaviour
 {
-    private CharacterType _selfCharacterType;
     [SerializeField] private int _damage;
 
-    public void DamageEnemy(IHealthSystem enemy)
+    public void DamageEnemy(IHealthSystem enemy, CharacterType selfType)
     {
-        switch (_selfCharacterType)
+        switch (selfType)
         {
             case CharacterType.EnemyNPC:
                 if (enemy.CharacterType == CharacterType.Player || enemy.CharacterType == CharacterType.AlliedNPC)

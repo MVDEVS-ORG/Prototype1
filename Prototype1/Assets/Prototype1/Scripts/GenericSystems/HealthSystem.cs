@@ -23,6 +23,15 @@ namespace prototype1.scripts.systems
         void IHealthSystem.TakeDamage(int damage)
         {
             _currentHealth = Mathf.Max(_currentHealth - damage, 0);
+            if(_currentHealth==0)
+            {
+                Die();
+            }
+        }
+
+        private void Die()
+        {
+            Destroy(gameObject);
         }
     }
 }
