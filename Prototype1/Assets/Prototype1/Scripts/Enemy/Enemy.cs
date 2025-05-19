@@ -1,3 +1,5 @@
+using prototype1.scripts.attacks;
+using prototype1.scripts.systems;
 using System;
 using UnityEngine;
 using UnityEngine.AI;
@@ -39,10 +41,13 @@ public class Enemy : MonoBehaviour
     [SerializeField]
     private float _currentHealth;
     private Vector3 _currentDestination;
+    private INPCAttack _npcAttack;
 
     private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        _npcAttack = GetComponent<INPCAttack>();
+        Debug.LogError($"Enemy npc Attack: {(_npcAttack != null)}");
         _currentHealth = maxHealth;
     }
 
@@ -68,7 +73,8 @@ public class Enemy : MonoBehaviour
             {
                 if (distanceToPlayer <= attackRange && Time.time > _lastAttackTime + attackCooldown)
                 {
-                    Attack();
+                    IHealthSystem playerHealthSystem = player.GetComponent<IHealthSystem>();
+                    _npcAttack.Attack(playerHealthSystem);
                     _lastAttackTime = Time.time;
                 }
                 else
@@ -82,11 +88,6 @@ public class Enemy : MonoBehaviour
             }
         }
         
-    }
-
-    private void Attack()
-    {
-        Debug.Log("Enemy Attacks Player");
     }
 
     private bool IsPlayerVisible(float distanceToPlayer)
@@ -105,17 +106,6 @@ public class Enemy : MonoBehaviour
         _followPlayer = false;
         _currentDestination = position;
         agent.SetDestination(position);
-    }
-
-    public void TakeDamage(float amount)
-    {
-        _currentHealth -= amount;
-        Debug.Log($"Enemy Took Damage: {amount}");
-
-        if(_currentHealth <= 0)
-        {
-            Die();
-        }
     }
 
     private void Die()
