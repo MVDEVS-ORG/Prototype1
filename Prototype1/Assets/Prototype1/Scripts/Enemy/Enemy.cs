@@ -1,3 +1,5 @@
+using prototype1.scripts.attacks;
+using prototype1.scripts.systems;
 using System;
 using UnityEngine;
 using UnityEngine.AI;
@@ -10,7 +12,7 @@ public enum EnemyType
     Boss
 }
 
-public class Enemy : MonoBehaviour
+public class Enemy : MonoBehaviour, IHealthSystem
 {
     [Header("Enemy Type")]
     public EnemyType enemyType;
@@ -40,6 +42,8 @@ public class Enemy : MonoBehaviour
     private float _currentHealth;
     private Vector3 _currentDestination;
 
+    public CharacterType CharacterType => CharacterType.EnemyNPC;
+
     private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -68,7 +72,8 @@ public class Enemy : MonoBehaviour
             {
                 if (distanceToPlayer <= attackRange && Time.time > _lastAttackTime + attackCooldown)
                 {
-                    Attack();
+                    IHealthSystem playerHealthSystem = player.GetComponent<IHealthSystem>();
+                    Attack(playerHealthSystem);
                     _lastAttackTime = Time.time;
                 }
                 else
@@ -84,9 +89,10 @@ public class Enemy : MonoBehaviour
         
     }
 
-    private void Attack()
+    private void Attack(IHealthSystem opponentHealth)
     {
         Debug.Log("Enemy Attacks Player");
+        opponentHealth.TakeDamage(10);
     }
 
     private bool IsPlayerVisible(float distanceToPlayer)
@@ -107,7 +113,7 @@ public class Enemy : MonoBehaviour
         agent.SetDestination(position);
     }
 
-    public void TakeDamage(float amount)
+    public void TakeDamage(int amount)
     {
         _currentHealth -= amount;
         Debug.Log($"Enemy Took Damage: {amount}");
@@ -124,5 +130,16 @@ public class Enemy : MonoBehaviour
         agent.isStopped = true;
 
         Destroy(gameObject);
+    }
+
+    public void RestoreHealth(int healing)
+    {
+        _currentHealth += healing;
+        if (_currentHealth > maxHealth) _currentHealth = maxHealth;
+    }
+
+    public void ResetHealth()
+    {
+        _currentHealth = maxHealth;
     }
 }
