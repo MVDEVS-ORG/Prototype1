@@ -21,11 +21,17 @@ public class DayNightManager : MonoBehaviour
 
     public static void ChangeDayState(DayStates state)
     {
+        Debug.Log(state);
         CurrentDayState = state;
         if (OnDayStateChanged != null)
         {
             OnDayStateChanged.Invoke(state);
         }
+    }
+
+    public void ChangeDay(bool day)
+    {
+        DayNightManager.ChangeDayState(day?DayStates.Day:DayStates.Night);
     }
 }
 
