@@ -13,21 +13,21 @@ public class RangedAttackPrefabScript : MonoBehaviour
             case CharacterType.EnemyNPC:
                 if (enemy.CharacterType == CharacterType.Player || enemy.CharacterType == CharacterType.AlliedNPC)
                 {
-                    enemy.TakeDamage(_damage);
+                    enemy?.TakeDamage(_damage);
                 }
                 break;
 
             case CharacterType.AlliedNPC:
                 if (enemy.CharacterType == CharacterType.EnemyNPC)
                 {
-                    enemy.TakeDamage(_damage);
+                    enemy?.TakeDamage(_damage);
                 }
                 break;
 
             case CharacterType.Player:
                 if (enemy.CharacterType == CharacterType.EnemyNPC)
                 {
-                    enemy.TakeDamage(_damage);
+                    enemy?.TakeDamage(_damage);
                 }
                 break;
         }

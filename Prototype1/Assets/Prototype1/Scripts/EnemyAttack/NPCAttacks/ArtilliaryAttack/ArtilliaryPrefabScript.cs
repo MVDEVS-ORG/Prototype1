@@ -56,21 +56,21 @@ public class ArtilliaryPrefabScript : MonoBehaviour
                 case CharacterType.EnemyNPC:
                     if (enemyHealth.CharacterType == CharacterType.Player || enemyHealth.CharacterType == CharacterType.AlliedNPC)
                     {
-                        enemyHealth.TakeDamage(_damage);
+                        enemyHealth?.TakeDamage(_damage);
                     }
                     break;
 
                 case CharacterType.AlliedNPC:
                     if (enemyHealth.CharacterType == CharacterType.EnemyNPC)
                     {
-                        enemyHealth.TakeDamage(_damage);
+                        enemyHealth?.TakeDamage(_damage);
                     }
                     break;
 
                 case CharacterType.Player:
                     if (enemyHealth.CharacterType == CharacterType.EnemyNPC)
                     {
-                        enemyHealth.TakeDamage(_damage);
+                        enemyHealth?.TakeDamage(_damage);
                     }
                     break;
             }
