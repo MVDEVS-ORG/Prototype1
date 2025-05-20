@@ -14,7 +14,7 @@ public enum TroopType
 [RequireComponent(typeof(NavMeshAgent))]
 public class Troop : MonoBehaviour
 {
-    public TroopType type;
+    public TroopType troopType;
     public float attackRange;
     public float mobility; // movement speed
     public Color defaultColor = Color.white;
@@ -58,7 +58,7 @@ public class Troop : MonoBehaviour
 
     void ApplyStatsByType()
     {
-        switch (type)
+        switch (troopType)
         {
             case TroopType.Gunner:
                 attackRange = 50f; mobility = 6f;

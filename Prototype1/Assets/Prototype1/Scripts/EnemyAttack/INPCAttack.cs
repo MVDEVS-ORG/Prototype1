@@ -11,6 +11,7 @@ namespace prototype1.scripts.attacks
     {
         Player,
         AlliedNPC,
-        EnemyNPC
+        EnemyNPC,
+        AliedBuildings
     }
 }
