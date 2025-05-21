@@ -26,7 +26,7 @@ namespace Assets.Prototype1.Scripts.Buildings
             if (door != null)
             {
                 doorClosedPos = door.transform.position;
-                doorOpenPos = doorClosedPos + new Vector3(0f, 3f, 0f); // Door opens upward by 3 units
+                doorOpenPos = doorClosedPos + new Vector3(0f, 6f, 0f); // Door opens upward by 6 units
             }
         }
 
