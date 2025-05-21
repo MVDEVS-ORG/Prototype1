@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 8950840764648015177}
   - component: {fileID: 53041735459725467}
   - component: {fileID: 3035195346462499345}
+  - component: {fileID: 8681835386089507017}
   m_Layer: 9
   m_Name: Troop
   m_TagString: Troop
@@ -124,7 +125,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5613e57bc9e5a474380d9f9b007e2c32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 0
+  troopType: 0
   attackRange: 3
   mobility: 3
   defaultColor: {r: 0, g: 0.9706273, b: 1, a: 1}
@@ -161,3 +162,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _animationTime: 2
   _attackPrefab: {fileID: 6560967314567969909, guid: c825b5434a0620d4dac4416b01a1c766, type: 3}
+--- !u!136 &8681835386089507017
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3001845776903029326}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}

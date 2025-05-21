@@ -31,6 +31,7 @@ namespace prototype1.scripts.attacks
             
             RangedAttackPrefabScript attack = Instantiate(_attackPrefab.gameObject, transform).GetComponent<RangedAttackPrefabScript>();
             yield return new WaitForSeconds(_animationTime);
+            attack.SetParameters(gameObject);
             attack.DamageEnemy(enemy, _healthSystem.CharacterType);
             Destroy(attack.gameObject);
             _attackCoroutine = null;

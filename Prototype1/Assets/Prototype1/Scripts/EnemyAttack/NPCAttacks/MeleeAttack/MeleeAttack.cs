@@ -29,7 +29,7 @@ namespace prototype1.scripts.attacks
         IEnumerator AttackUsingMelee()
         {
             AttackPrefabScript attack = Instantiate(_attackPrefab.gameObject, transform).GetComponent<AttackPrefabScript>();
-            attack.SetCharacterType(_healthSystem.CharacterType);
+            attack.SetCharacterType(_healthSystem.CharacterType, gameObject);
             yield return new WaitForSeconds(_animationTime);
             Destroy(attack.gameObject);
             _attackCoroutine = null;

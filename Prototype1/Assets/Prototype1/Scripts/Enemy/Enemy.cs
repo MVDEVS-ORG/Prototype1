@@ -1,9 +1,7 @@
 using prototype1.scripts.attacks;
 using prototype1.scripts.stateMachine;
 using prototype1.scripts.systems;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+using System.Xml;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -42,6 +40,7 @@ public class Enemy : MonoBehaviour
 
     private HealthSystem _sideObjective = null;
     private HealthSystem _mainObjective;
+    private HealthSystem _selfHealth;
 
 
     private void Start()
@@ -50,6 +49,9 @@ public class Enemy : MonoBehaviour
         _npcAttack = GetComponent<INPCAttack>();
         stateMachine = new StateMachine();
         stateMachine.Initialize();
+        _selfHealth = GetComponent<HealthSystem>();
+        _selfHealth.OnDamaged += AttackIfProvoked;
+        _selfHealth.OnZeroHealth += Die;
     }
 
     private void Update()
@@ -60,7 +62,7 @@ public class Enemy : MonoBehaviour
             ticks = 0;
             if(HasNPCReachedCurrentObjective() && _currentDestination!=null)
             {
-                agent.isStopped = false;
+                agent.isStopped = true;
                 stateMachine.changeState(NPCState.Attack);
             }
             else
@@ -114,6 +116,33 @@ public class Enemy : MonoBehaviour
         } 
     }
 
+    private void Die()
+    {
+        _selfHealth.OnDamaged -= AttackIfProvoked;
+        _selfHealth.OnZeroHealth -= Die;   
+        Destroy(gameObject);
+    }
+
+    private void AttackIfProvoked(GameObject provoker)
+    {
+        if (provoker != null)
+        {
+
+
+            if (IsObjectiveVisible(Vector3.Distance(transform.position, provoker.transform.position), CharacterType.EnemyNPC))
+            {
+                if (provoker.TryGetComponent(out HealthSystem enemy))
+                {
+                    _currentDestination = provoker.transform.position;
+                    _sideObjective = enemy;
+                    agent.isStopped = false;
+                    agent.SetDestination(_currentDestination);
+                    stateMachine.changeState(NPCState.Move);
+                }
+            }
+        }
+    }
+
     public void SetNPCMainObjective(HealthSystem point)
     {
         Debug.LogError(point == null);
@@ -128,6 +157,7 @@ public class Enemy : MonoBehaviour
         if (buildHits.Length == 0 && (stateMachine.CurrentState == NPCState.Move || stateMachine.CurrentState == NPCState.Idle))
         {
             Collider[] hits = Physics.OverlapSphere(transform.position, detectionRange, alliedTroopsLayerMask);
+            Debug.LogError(hits.Length);
             SetPlayerDestination(hits);
         }
         else
@@ -157,6 +187,7 @@ public class Enemy : MonoBehaviour
                     closestCollider = item;
                 }
             }
+            Debug.LogError(closestCollider.gameObject.name);
             if (closestCollider != null)
             {
                 if (closestCollider.TryGetComponent(out HealthSystem objectiveHealth))

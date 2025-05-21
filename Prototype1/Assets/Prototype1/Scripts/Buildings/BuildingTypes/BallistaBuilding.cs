@@ -68,7 +68,7 @@ namespace Assets.Prototype1.Scripts.Buildings
                     if (Time.time > (lastAttackTime + attackCooldown))
                     {
                         Debug.Log("Ballista attacked enemy.");
-                        enemy.TakeDamage(damage);
+                        enemy.TakeDamage(damage,null);
                         lastAttackTime = Time.time;
                     }
                 }
