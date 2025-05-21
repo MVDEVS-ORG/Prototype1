@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4452842858578954260}
   - component: {fileID: 2168121225723132469}
   - component: {fileID: 7060178171135903200}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Agent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -133,9 +133,7 @@ MonoBehaviour:
   detectionRange: 15
   attackRange: 2
   attackCooldown: 1.5
-  maxHealth: 100
   _isPlayerVisible: 0
   _followPlayer: 0
   _isReachedDestination: 0
   _isFollowiongCommand: 0
-  _currentHealth: 0
