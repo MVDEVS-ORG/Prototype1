@@ -1,7 +1,10 @@
+using prototype1.scripts.systems;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public class EnemySpawner : MonoBehaviour
 {
@@ -9,25 +12,28 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] GameObject _grunts;
     [SerializeField] GameObject _gunners;
     [SerializeField] GameObject _elites;
-    [SerializeField] int _numberOfGrunts;
-    [SerializeField] int _numberOfGunners;
-    [SerializeField] int _numberOfElites;
-
-    [SerializeField] float _spawnDelay;
 
     [Header("Spawner dimensions")]
     [SerializeField] int _spawnRadius;
-    
-    private bool _spawn = true;
-    private Dictionary<GameObject, int> _spawnRecords = new();
+
+    [SerializeField] private List<Groups> _groups;
+    private Dictionary<EnemyType, GameObject> _enemyPref = new();
 
     [Header("Reference required by enemies")]
-    [SerializeField] Transform _player;
+    [SerializeField] HealthSystem _playerBase;
+
+    // revamp based on groups 
+    // create a group class that can spawn say 5 enemies first then 10 after some delay the 15 and so on after delays and the groups can be mixed
     public void Start()
     {
-        _spawnRecords[_grunts] = _numberOfGrunts;
-        _spawnRecords[_gunners] = _numberOfGunners;
-        _spawnRecords[_elites] = _numberOfElites;
+        _enemyPref[EnemyType.Grunts] = _grunts;
+        _enemyPref[EnemyType.Ranged] = _gunners;
+        _enemyPref[EnemyType.Elites] = _elites;
+        _enemyPref[EnemyType.Boss] = null;
+        foreach (var group in _groups)
+        {
+            group.SetValues();
+        }
     }
 
     public void StartSpawn()
@@ -37,30 +43,60 @@ public class EnemySpawner : MonoBehaviour
 
     IEnumerator spawnEnemies()
     {
-        foreach(var enemy in _spawnRecords)
+        foreach(var enemyGroup in _groups)
         {
-            int numberOfEnemies = enemy.Value;
-            int NumberOfAttempts = 0;
-            while(numberOfEnemies>0)
+            yield return new WaitForSeconds(enemyGroup.delayBeforeSpawn);
+            foreach(var enemyType in enemyGroup.spawnValues)
             {
-                if(NumberOfAttempts>5)
+                try
                 {
-                    break;
+                    int numberOfEnemies = enemyType.Value;
+                    int NumberOfAttempts = 0;
+                    while (numberOfEnemies > 0)
+                    {
+                        if (NumberOfAttempts > 5)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            NumberOfAttempts++;
+                        }
+                        Vector2 rngInCircle = UnityEngine.Random.insideUnitCircle * _spawnRadius;
+                        Vector3 randomPoint = transform.position + new Vector3(rngInCircle.x, transform.position.y, rngInCircle.y);
+                        if (NavMesh.SamplePosition(randomPoint, out NavMeshHit pointFound, 2f, NavMesh.AllAreas))
+                        {
+                            Enemy enemies = Instantiate(_enemyPref[enemyType.Key], pointFound.position, Quaternion.identity).GetComponent<Enemy>();
+                            enemies.SetNPCMainObjective(_playerBase);
+                            numberOfEnemies--;
+                        }
+                    }
                 }
-                else
+                catch (Exception exception)
                 {
-                    NumberOfAttempts++;
-                }
-                Vector2 rngInCircle = Random.insideUnitCircle * _spawnRadius;
-                Vector3 randomPoint = transform.position + new Vector3(rngInCircle.x,transform.position.y, rngInCircle.y);
-                if (NavMesh.SamplePosition(randomPoint, out NavMeshHit pointFound, 2f, NavMesh.AllAreas))
-                {
-                    Enemy enemies = Instantiate(enemy.Key, pointFound.position, Quaternion.identity).GetComponent<Enemy>();
-                    enemies.player = _player;
-                    numberOfEnemies--;
-                    yield return new WaitForSeconds(_spawnDelay);
+                    Debug.LogError(exception);
                 }
             }
         }
+    }
+}
+
+[Serializable]
+public class Groups
+{
+    public float delayBeforeSpawn;
+    public int numberOfGrunts;
+    public int numberOfGunners;
+    public int numberOfElites;
+    public int numberOfBosses;
+
+    public Dictionary<EnemyType, int> spawnValues = new();
+
+    public void SetValues()
+    {
+        spawnValues[EnemyType.Grunts] = numberOfGrunts;
+        spawnValues[EnemyType.Ranged] = numberOfGunners;
+        spawnValues[EnemyType.Elites] = numberOfElites;
+        spawnValues[EnemyType.Boss] = numberOfBosses;
     }
 }

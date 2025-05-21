@@ -13,7 +13,6 @@ public class ArtilliaryPrefabScript : MonoBehaviour
     private float _timer=0f;
     private Vector3 _upperCoordinate;
     private SphereCollider _collider;
-    private bool _endOfMovement = false;
     private CharacterType _selfCharacterType;
 
     public void SetParameters(Vector3 pos, CharacterType selfType)
@@ -41,7 +40,6 @@ public class ArtilliaryPrefabScript : MonoBehaviour
             _timer += Time.deltaTime/_time;
             yield return new WaitForEndOfFrame();
         }
-        _endOfMovement = true;
         _collider.enabled = true;
         Destroy(gameObject,0.5f);
     }

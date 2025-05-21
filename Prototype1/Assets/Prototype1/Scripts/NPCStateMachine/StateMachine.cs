@@ -15,7 +15,7 @@ namespace prototype1.scripts.stateMachine
 
         public event Action<NPCState, NPCState> OnStateChange;
 
-        private Dictionary<NPCState, List<NPCState>> _possibleTransitions;
+        private Dictionary<NPCState, List<NPCState>> _possibleTransitions = new();
 
         void IStateMachine.changeState(NPCState newState)
         {
@@ -29,6 +29,7 @@ namespace prototype1.scripts.stateMachine
             }
             else
             {
+                Debug.LogWarning($"{_currentState} {newState}");
                 Debug.LogError("Transistion Not possible");
             }
         }

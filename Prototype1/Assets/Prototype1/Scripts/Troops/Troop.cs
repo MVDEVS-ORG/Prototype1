@@ -112,7 +112,6 @@ public class Troop : MonoBehaviour
                     _agent.isStopped = true;
                     if (Time.time > (_lastAttackTime + attackCooldown))
                     {
-                        Debug.LogError("Reached");
                         _npcAttack.Attack(enemy);
                         _lastAttackTime = Time.time; 
                     }
