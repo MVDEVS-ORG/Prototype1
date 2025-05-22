@@ -12,7 +12,6 @@ namespace Assets.Prototype1.Scripts.Buildings
         public BuildingState State { get; protected set; } = BuildingState.Ruined;
         public BuildingTypes BuildingType { get; protected set; }
         public int maxUpgradeLimit { get; protected set; }
-        public int currentHealth;
         public int currentUpgrade;
         public Renderer m_Renderer;
 
@@ -70,7 +69,6 @@ namespace Assets.Prototype1.Scripts.Buildings
         }
 
         public abstract void UpgradeBuilding();
-        public abstract void TakeDamage(int damage);
     }
 
 }

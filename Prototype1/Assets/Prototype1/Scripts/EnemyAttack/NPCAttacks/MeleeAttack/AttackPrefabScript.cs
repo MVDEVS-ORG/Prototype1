@@ -1,3 +1,4 @@
+using Assets.Prototype1.Scripts.Buildings;
 using prototype1.scripts.attacks;
 using prototype1.scripts.systems;
 using UnityEngine;
@@ -17,14 +18,27 @@ public class AttackPrefabScript : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        Debug.LogError(other.gameObject.name + "this is what we are looking for");
         if (other.TryGetComponent(out HealthSystem enemy))
         {
             IHealthSystem enemyHealth = enemy;
             switch (_selfCharacterType)
             {
                 case CharacterType.EnemyNPC:
-                    if(enemyHealth.CharacterType==CharacterType.Player || enemyHealth.CharacterType == CharacterType.AlliedNPC)
+                    if(enemyHealth.CharacterType==CharacterType.Player || enemyHealth.CharacterType == CharacterType.AlliedNPC || enemyHealth.CharacterType == CharacterType.AliedBuildings)
                     {
+                        if(enemyHealth.CharacterType == CharacterType.AliedBuildings)
+                        {
+                            var state = other.GetComponent<Building>().State;
+                            if(state == BuildingState.Ruined)
+                            {
+                                return;
+                            }
+                            else
+                            {
+                                enemyHealth?.TakeDamage(_damage, sender);
+                            }
+                        }
                         enemyHealth?.TakeDamage(_damage, sender );
                     }
                     break;

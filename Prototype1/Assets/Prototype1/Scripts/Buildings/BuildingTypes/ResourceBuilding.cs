@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using prototype1.scripts.systems;
+using System.Collections;
 using UnityEngine;
 
 namespace Assets.Prototype1.Scripts.Buildings
@@ -14,10 +15,12 @@ namespace Assets.Prototype1.Scripts.Buildings
     {
         public ResourceBuildingType ResourceType;
         private int resourcePerDay;
+        private HealthSystem _selfHealthSystem;
         
         private void Start()
         {
             BuildingType = BuildingTypes.Resource;
+            _selfHealthSystem = GetComponent<HealthSystem>();
             SetInitialValues();
         }
 
@@ -42,6 +45,8 @@ namespace Assets.Prototype1.Scripts.Buildings
                     break;
             }
             CanBeUpgraded = true;
+            (_selfHealthSystem as IHealthSystem).ResetHealth();
+            _selfHealthSystem.OnZeroHealth += Die;
         }
 
         public override void UpgradeBuilding()
@@ -65,18 +70,12 @@ namespace Assets.Prototype1.Scripts.Buildings
         {
             return resourcePerDay;
         }
-
-        public override void TakeDamage(int damage)
+        void Die()
         {
-            if (State != BuildingState.Completed) return;
-
-            currentHealth -= damage;
-            if (currentHealth <= 0)
-            {
-                State = BuildingState.Ruined;
-                m_Renderer.material.color = Color.gray;
-                Debug.Log($"{ResourceType} destroyed!");
-            }
+            State = BuildingState.Ruined;
+            m_Renderer.material.color = Color.gray;
+            Debug.Log($"{ResourceType} destroyed!");
+            _selfHealthSystem.OnZeroHealth -= Die;
         }
     }
 }

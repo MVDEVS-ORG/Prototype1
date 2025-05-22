@@ -130,7 +130,7 @@ MonoBehaviour:
   obstacleMask:
     serializedVersion: 2
     m_Bits: 128
-  detectionRange: 25
+  detectionRange: 50
   attackRange: 3
   attackCooldown: 1.5
   buildingLayerMask:

@@ -19,9 +19,12 @@ namespace Assets.Prototype1.Scripts.Buildings
         public float attackCooldown = 1.5f;
         private float lastAttackTime;
         private GameObject _targetEnemy;
+        private HealthSystem _selfHealthSystem;
 
         private void Start()
         {
+            _selfHealthSystem = GetComponent<HealthSystem>();
+            _selfHealthSystem.OnZeroHealth += Die;
             SetInitialValues();
         }
 
@@ -31,6 +34,7 @@ namespace Assets.Prototype1.Scripts.Buildings
             UpgradeCost = 15;
             CanBeUpgraded = true;
             maxUpgradeLimit = 3; // Fix: properly initialized
+            (_selfHealthSystem as IHealthSystem).ResetHealth();
         }
 
         protected override void Update()
@@ -106,19 +110,16 @@ namespace Assets.Prototype1.Scripts.Buildings
             Debug.Log($"Ballista upgraded to {CurrentBallista}.");
         }
 
-        public override void TakeDamage(int damage)
+
+        void Die()
         {
-            if (State != BuildingState.Completed) return;
+            State = BuildingState.Ruined;
+            if (m_Renderer != null)
+                m_Renderer.material.color = Color.gray;
 
-            currentHealth -= damage;
-            if (currentHealth <= 0)
-            {
-                State = BuildingState.Ruined;
-                if (m_Renderer != null)
-                    m_Renderer.material.color = Color.gray;
-
-                Debug.Log("Ballista destroyed!");
-            }
+            Debug.Log("Ballista destroyed!");
+            _selfHealthSystem.OnZeroHealth -= Die;
+            
         }
     }
 }

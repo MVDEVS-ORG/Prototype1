@@ -30,7 +30,6 @@ namespace prototype1.scripts.stateMachine
             else
             {
                 Debug.LogWarning($"{_currentState} {newState}");
-                Debug.LogError("Transistion Not possible");
             }
         }
 
