@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 5429905781265650135}
   - component: {fileID: 7284105300499556458}
   - component: {fileID: 1342672528189421926}
+  - component: {fileID: -2192448928867333144}
   m_Layer: 9
   m_Name: Sniper
   m_TagString: Troop
@@ -161,3 +162,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _animationTime: 2
   _attackPrefab: {fileID: 6560967314567969909, guid: c825b5434a0620d4dac4416b01a1c766, type: 3}
+--- !u!136 &-2192448928867333144
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1466869108448394042}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5000001
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}

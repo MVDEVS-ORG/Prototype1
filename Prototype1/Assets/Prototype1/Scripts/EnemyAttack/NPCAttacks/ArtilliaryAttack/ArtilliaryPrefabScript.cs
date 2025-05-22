@@ -13,11 +13,12 @@ public class ArtilliaryPrefabScript : MonoBehaviour
     private float _timer=0f;
     private Vector3 _upperCoordinate;
     private SphereCollider _collider;
-    private bool _endOfMovement = false;
     private CharacterType _selfCharacterType;
+    private GameObject sender=null;
 
-    public void SetParameters(Vector3 pos, CharacterType selfType)
+    public void SetParameters(Vector3 pos, CharacterType selfType,GameObject sender)
     {
+        this.sender = sender; 
         _startPos = transform.position;
         _endPos = pos;
         _upperCoordinate = Vector3.Lerp(_startPos, _endPos, 0.5f);
@@ -41,7 +42,6 @@ public class ArtilliaryPrefabScript : MonoBehaviour
             _timer += Time.deltaTime/_time;
             yield return new WaitForEndOfFrame();
         }
-        _endOfMovement = true;
         _collider.enabled = true;
         Destroy(gameObject,0.5f);
     }
@@ -56,21 +56,21 @@ public class ArtilliaryPrefabScript : MonoBehaviour
                 case CharacterType.EnemyNPC:
                     if (enemyHealth.CharacterType == CharacterType.Player || enemyHealth.CharacterType == CharacterType.AlliedNPC)
                     {
-                        enemyHealth.TakeDamage(_damage);
+                        enemyHealth?.TakeDamage(_damage, sender);
                     }
                     break;
 
                 case CharacterType.AlliedNPC:
                     if (enemyHealth.CharacterType == CharacterType.EnemyNPC)
                     {
-                        enemyHealth.TakeDamage(_damage);
+                        enemyHealth?.TakeDamage(_damage, sender);
                     }
                     break;
 
                 case CharacterType.Player:
                     if (enemyHealth.CharacterType == CharacterType.EnemyNPC)
                     {
-                        enemyHealth.TakeDamage(_damage);
+                        enemyHealth?.TakeDamage(_damage, sender);
                     }
                     break;
             }

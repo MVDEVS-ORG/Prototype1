@@ -22,7 +22,7 @@ namespace prototype1.scripts.attacks
         IEnumerator AttackUsingShell(Vector3 pos)
         {
             ArtilliaryPrefabScript attack = Instantiate(_attackPrefab.gameObject, transform.position, Quaternion.identity).GetComponent<ArtilliaryPrefabScript>();
-            attack.SetParameters(pos, _healthSystem.CharacterType);
+            attack.SetParameters(pos, _healthSystem.CharacterType, gameObject);
             yield return null;
         }
     }

@@ -1,6 +1,7 @@
 using prototype1.scripts.attacks;
+using prototype1.scripts.stateMachine;
 using prototype1.scripts.systems;
-using System;
+using System.Xml;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -18,92 +19,209 @@ public class Enemy : MonoBehaviour
     public EnemyType enemyType;
 
     [Header("References")]
-    public Transform player;
     public LayerMask obstacleMask;
-    public LayerMask playerMask;
 
     [Header("Settings")]
     public float detectionRange = 15f;
     public float attackRange = 2f;
     public float attackCooldown = 1.5f;
-
+    public LayerMask buildingLayerMask;
+    public LayerMask alliedTroopsLayerMask;
+    [Tooltip("This is in number of frames after which update will get triggered")]
+    public int enemyDetectionTickRate;
+    private int ticks = 0;
+    private IStateMachine stateMachine; 
     private NavMeshAgent agent;
     private float _lastAttackTime;
     [SerializeField]
-    private bool _isPlayerVisible;
-    [SerializeField]
-    private bool _followPlayer;
-    [SerializeField]
     private bool _isReachedDestination;
-    [SerializeField]
-    private bool _isFollowiongCommand = false;
     private Vector3 _currentDestination;
     private INPCAttack _npcAttack;
+
+    private HealthSystem _sideObjective = null;
+    private HealthSystem _mainObjective;
+    private HealthSystem _selfHealth;
+
 
     private void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         _npcAttack = GetComponent<INPCAttack>();
+        stateMachine = new StateMachine();
+        stateMachine.Initialize();
+        _selfHealth = GetComponent<HealthSystem>();
+        _selfHealth.OnDamaged += AttackIfProvoked;
+        _selfHealth.OnZeroHealth += Die;
     }
 
     private void Update()
     {
-        if (_isFollowiongCommand)
+        ticks++;
+        if(ticks>enemyDetectionTickRate)
         {
-            if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+            ticks = 0;
+            if(HasNPCReachedCurrentObjective() && _currentDestination!=null)
             {
-                if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
-                {
-                    _isFollowiongCommand = false;
-                    _followPlayer = true;
-                }
-            }
-        }
-        if (_followPlayer)
-        {
-            float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-            _isPlayerVisible = IsPlayerVisible(distanceToPlayer);
-
-            if (_isPlayerVisible && distanceToPlayer <= detectionRange)
-            {
-                if (distanceToPlayer <= attackRange)
-                {
-                    if (Time.time > (_lastAttackTime + attackCooldown))
-                    {
-                        agent.isStopped = true;
-                        IHealthSystem playerHealthSystem = player.GetComponent<IHealthSystem>();
-                        _npcAttack.Attack(playerHealthSystem);
-                        _lastAttackTime = Time.time;
-                    }
-                }
-                else
-                {
-                    agent.isStopped = false;
-                    agent.SetDestination(player.position);
-                }
+                agent.isStopped = true;
+                stateMachine.changeState(NPCState.Attack);
             }
             else
             {
-                agent.ResetPath();
+                if (stateMachine.CurrentState != NPCState.Move)
+                {
+                    stateMachine.changeState(NPCState.Move);
+                }
             }
-        }
-        
+            if(_sideObjective==null)
+            {
+                if (stateMachine.CurrentState != NPCState.Attack)
+                {
+                    SearchSideObjective();
+                }
+                if (_sideObjective == null)
+                {
+                    agent.isStopped = false;
+                    _currentDestination = _mainObjective.transform.position;
+                    agent.SetDestination(_mainObjective.transform.position);
+                    if (stateMachine.CurrentState != NPCState.Move)
+                    {
+                        stateMachine.changeState(NPCState.Move);
+                    }
+                }
+            }
+            if (stateMachine.CurrentState == NPCState.Attack && _sideObjective != null)
+            {
+                if (Time.time > (_lastAttackTime + attackCooldown))
+                {
+                    agent.isStopped = true;
+                    IHealthSystem playerHealthSystem = _sideObjective;
+                    _npcAttack.Attack(playerHealthSystem);
+                    _lastAttackTime = Time.time;
+                }
+            }
+            else if (stateMachine.CurrentState == NPCState.Attack && _mainObjective!= null)
+            {
+                if (Time.time > (_lastAttackTime + attackCooldown))
+                {
+                    agent.isStopped = true;
+                    IHealthSystem playerHealthSystem = _mainObjective;
+                    _npcAttack.Attack(playerHealthSystem);
+                    _lastAttackTime = Time.time;
+                }
+            }
+            else if(_sideObjective == null && _mainObjective== null)
+            {
+                stateMachine.changeState(NPCState.Idle);
+            }
+        } 
     }
 
-    private bool IsPlayerVisible(float distanceToPlayer)
+    private void Die()
     {
-        Vector3 direction = (player.position - transform.position).normalized;
-        if(Physics.Raycast(transform.position, direction, out RaycastHit hit, distanceToPlayer, obstacleMask | playerMask))
+        _selfHealth.OnDamaged -= AttackIfProvoked;
+        _selfHealth.OnZeroHealth -= Die;   
+        Destroy(gameObject);
+    }
+
+    private void AttackIfProvoked(GameObject provoker)
+    {
+        if (provoker != null)
         {
-            return hit.transform.CompareTag("Player");
+
+
+            if (IsObjectiveVisible(Vector3.Distance(transform.position, provoker.transform.position), CharacterType.EnemyNPC))
+            {
+                if (provoker.TryGetComponent(out HealthSystem enemy))
+                {
+                    _currentDestination = provoker.transform.position;
+                    _sideObjective = enemy;
+                    agent.isStopped = false;
+                    agent.SetDestination(_currentDestination);
+                    stateMachine.changeState(NPCState.Move);
+                }
+            }
+        }
+    }
+
+    public void SetNPCMainObjective(HealthSystem point)
+    {
+        Debug.LogError(point == null);
+        _mainObjective = point;
+        _currentDestination= _mainObjective.transform.position;
+        agent.SetDestination(_mainObjective.transform.position);
+    }
+
+    private void SearchSideObjective()
+    {
+        Collider[] buildHits = Physics.OverlapSphere(transform.position, detectionRange, buildingLayerMask);
+        if (buildHits.Length == 0 && (stateMachine.CurrentState == NPCState.Move || stateMachine.CurrentState == NPCState.Idle))
+        {
+            Collider[] hits = Physics.OverlapSphere(transform.position, detectionRange, alliedTroopsLayerMask);
+            Debug.LogError(hits.Length);
+            SetPlayerDestination(hits);
+        }
+        else
+        {
+            SetPlayerDestination(buildHits);
+        }
+
+    }
+
+    private bool HasNPCReachedCurrentObjective()
+    {
+        return Vector3.Distance(transform.position, _currentDestination)<=attackRange;
+    }
+
+    private void SetPlayerDestination(Collider[] hits)
+    {
+        if (hits.Length > 0)
+        {
+            float minDistance = 10000;
+            Collider closestCollider = null;
+            foreach (var item in hits)
+            {
+                float dist = Vector3.Distance(item.transform.position, transform.position);
+                if (dist < minDistance)
+                {
+                    minDistance = dist;
+                    closestCollider = item;
+                }
+            }
+            Debug.LogError(closestCollider.gameObject.name);
+            if (closestCollider != null)
+            {
+                if (closestCollider.TryGetComponent(out HealthSystem objectiveHealth))
+                {
+                    _currentDestination = closestCollider.transform.position;
+                    agent.isStopped = false;
+                    agent.SetDestination(_currentDestination);
+                    stateMachine.changeState(NPCState.Move);
+                    _sideObjective = objectiveHealth;
+                }
+            }
+        }
+    }
+
+    private bool IsObjectiveVisible(float distanceToPlayer, CharacterType objectiveType)
+    {
+        Vector3 direction = (_currentDestination - transform.position).normalized;
+        if (Physics.Raycast(transform.position, direction, out RaycastHit hit, distanceToPlayer, obstacleMask | alliedTroopsLayerMask))
+        {
+            if (hit.transform.TryGetComponent(out IHealthSystem health))
+            {
+                if(health.CharacterType == objectiveType)
+                {
+                    return true;
+                }
+                return false;
+            }
+            return false;
         }
         return false;
     }
 
     public void MoveToPostion(Vector3 position)
     {
-        _isFollowiongCommand = true;
-        _followPlayer = false;
         _currentDestination = position;
         agent.SetDestination(position);
     }

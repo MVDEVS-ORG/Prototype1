@@ -127,20 +127,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyType: 0
-  player: {fileID: 0}
   obstacleMask:
     serializedVersion: 2
     m_Bits: 128
-  playerMask:
-    serializedVersion: 2
-    m_Bits: 256
   detectionRange: 25
   attackRange: 3
   attackCooldown: 1.5
-  _isPlayerVisible: 0
-  _followPlayer: 1
+  buildingLayerMask:
+    serializedVersion: 2
+    m_Bits: 2048
+  alliedTroopsLayerMask:
+    serializedVersion: 2
+    m_Bits: 768
+  enemyDetectionTickRate: 4
   _isReachedDestination: 0
-  _isFollowiongCommand: 0
 --- !u!136 &6006689673505640027
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -215,7 +215,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0

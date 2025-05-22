@@ -7,9 +7,11 @@ public class AttackPrefabScript : MonoBehaviour
 {
     private CharacterType _selfCharacterType;
     [SerializeField] private int _damage;
+    private GameObject sender;
 
-    public void SetCharacterType(CharacterType selfType)
+    public void SetCharacterType(CharacterType selfType, GameObject sender)
     {
+        this.sender = sender;
         _selfCharacterType = selfType;
     }
 
@@ -23,21 +25,21 @@ public class AttackPrefabScript : MonoBehaviour
                 case CharacterType.EnemyNPC:
                     if(enemyHealth.CharacterType==CharacterType.Player || enemyHealth.CharacterType == CharacterType.AlliedNPC)
                     {
-                        enemyHealth.TakeDamage(_damage);
+                        enemyHealth?.TakeDamage(_damage, sender );
                     }
                     break;
 
                 case CharacterType.AlliedNPC:
                     if(enemyHealth.CharacterType == CharacterType.EnemyNPC)
                     {
-                        enemyHealth.TakeDamage(_damage);
+                        enemyHealth?.TakeDamage(_damage, sender);
                     }
                     break;
 
                 case CharacterType.Player:
                     if(enemyHealth.CharacterType == CharacterType.EnemyNPC)
                     {
-                        enemyHealth.TakeDamage(_damage);
+                        enemyHealth?.TakeDamage(_damage, sender);
                     }
                     break;
             }
