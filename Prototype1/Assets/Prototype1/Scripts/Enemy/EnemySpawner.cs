@@ -22,8 +22,6 @@ public class EnemySpawner : MonoBehaviour
     [Header("Reference required by enemies")]
     [SerializeField] HealthSystem _playerBase;
 
-    public bool AllEnemiesSpawned = false;
-
     // revamp based on groups 
     // create a group class that can spawn say 5 enemies first then 10 after some delay the 15 and so on after delays and the groups can be mixed
     public void Start()
@@ -36,6 +34,7 @@ public class EnemySpawner : MonoBehaviour
         {
             group.SetValues();
         }
+        DayNightManager.instance.AddEnemySpawners();
     }
 
     public void StartSpawn()
@@ -70,6 +69,7 @@ public class EnemySpawner : MonoBehaviour
                         {
                             GameObject enemyObj = Instantiate(_enemyPref[enemyType.Key], pointFound.position, Quaternion.identity);
                             Enemy enemies = enemyObj.GetComponent<Enemy>();
+                            DayNightManager.instance?.enemies.Add(enemies);
                             enemies.SetNPCMainObjective(_playerBase);
                             numberOfEnemies--;
                         }
@@ -81,7 +81,7 @@ public class EnemySpawner : MonoBehaviour
                 }
             }
         }
-        AllEnemiesSpawned = true;
+        DayNightManager.instance.AllEnemiesSpawned();
     }
 }
 

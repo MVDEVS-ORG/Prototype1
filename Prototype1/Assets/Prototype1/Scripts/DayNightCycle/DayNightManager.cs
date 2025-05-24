@@ -1,3 +1,4 @@
+using prototype1.scripts.systems;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,11 @@ public class DayNightManager : MonoBehaviour
 
     public static event Action<DayStates> OnDayStateChanged;
     public static DayStates CurrentDayState = DayStates.Day;
+
+    public List<Enemy> enemies = new();
+
+    private int NumberOfSpawners = 0;
+    private int FinishedSpawns = 0;
 
     private void Awake()
     {
@@ -33,7 +39,21 @@ public class DayNightManager : MonoBehaviour
 
     public void ChangeDay(bool day)
     {
-        DayNightManager.ChangeDayState(day?DayStates.Day:DayStates.Night);
+        ChangeDayState(day?DayStates.Day:DayStates.Night);
+    }
+
+    public void AddEnemySpawners()
+    {
+        NumberOfSpawners++;
+    }
+
+    public void AllEnemiesSpawned()
+    {
+        FinishedSpawns++;
+        if(FinishedSpawns>NumberOfSpawners && enemies.Count==0)
+        {
+            ChangeDayState(DayStates.Day);
+        }
     }
 }
 
