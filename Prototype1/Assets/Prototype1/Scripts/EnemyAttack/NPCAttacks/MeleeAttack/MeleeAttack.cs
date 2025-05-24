@@ -11,6 +11,7 @@ namespace prototype1.scripts.attacks
         [SerializeField] AttackPrefabScript _attackPrefab;
         Coroutine _attackCoroutine;
         IHealthSystem _healthSystem;
+        [SerializeField] private int _damage;
 
         private void Start()
         {
@@ -29,7 +30,7 @@ namespace prototype1.scripts.attacks
         IEnumerator AttackUsingMelee()
         {
             AttackPrefabScript attack = Instantiate(_attackPrefab.gameObject, transform).GetComponent<AttackPrefabScript>();
-            attack.SetCharacterType(_healthSystem.CharacterType, gameObject);
+            attack.SetCharacterType(_healthSystem.CharacterType, gameObject, _damage);
             yield return new WaitForSeconds(_animationTime);
             Destroy(attack.gameObject);
             _attackCoroutine = null;

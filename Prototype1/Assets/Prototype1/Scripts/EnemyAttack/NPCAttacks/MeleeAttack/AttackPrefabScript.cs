@@ -10,10 +10,11 @@ public class AttackPrefabScript : MonoBehaviour
     [SerializeField] private int _damage;
     private GameObject sender;
 
-    public void SetCharacterType(CharacterType selfType, GameObject sender)
+    public void SetCharacterType(CharacterType selfType, GameObject sender, int damage)
     {
         this.sender = sender;
         _selfCharacterType = selfType;
+        _damage = damage;
     }
 
     private void OnTriggerEnter(Collider other)

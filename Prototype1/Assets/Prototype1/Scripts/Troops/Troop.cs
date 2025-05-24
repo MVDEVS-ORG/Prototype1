@@ -29,6 +29,7 @@ public class Troop : MonoBehaviour
     private INPCAttack _npcAttack;
     private float _lastAttackTime = 0f;
     private HealthSystem _healthSystem;
+    [SerializeField] private LayerMask _enemyLayerMask;
 
     public CharacterType CharacterType => CharacterType.AlliedNPC;
 
@@ -118,11 +119,14 @@ public class Troop : MonoBehaviour
                 _agent.SetDestination(_targetEnemy.transform.position);
                 if (minDist < attackRange)
                 {
-                    _agent.isStopped = true;
-                    if (Time.time > (_lastAttackTime + attackCooldown))
+                    if (IsObjectiveVisible(_targetEnemy.transform.position, Vector3.Distance(_targetEnemy.transform.position, transform.position), CharacterType.EnemyNPC))
                     {
-                        _npcAttack.Attack(enemy);
-                        _lastAttackTime = Time.time; 
+                        _agent.isStopped = true;
+                        if (Time.time > (_lastAttackTime + attackCooldown))
+                        {
+                            _npcAttack.Attack(enemy);
+                            _lastAttackTime = Time.time;
+                        }
                     }
                 }
                 else
@@ -130,8 +134,28 @@ public class Troop : MonoBehaviour
                     _agent.isStopped = false;
                     _agent.SetDestination(_targetEnemy.transform.position);
                 }
-                if (minDist <= 1.5f) _npcAttack.Attack(_targetEnemy.GetComponent<IHealthSystem>());
+                if (minDist <= 1.5f)
+                {
+                    _npcAttack.Attack(enemy);
+                }
             }
         }
+    }
+    private bool IsObjectiveVisible(Vector3 objective, float distanceToPlayer, CharacterType objectiveType)
+    {
+        Vector3 direction = (objective - transform.position).normalized;
+        if (Physics.Raycast(transform.position, direction, out RaycastHit hit, distanceToPlayer, _enemyLayerMask))
+        {
+            if (hit.transform.TryGetComponent(out HealthSystem health))
+            {
+                if ((health as IHealthSystem).CharacterType == objectiveType)
+                {
+                    return true;
+                }
+                return false;
+            }
+            return false;
+        }
+        return false;
     }
 }

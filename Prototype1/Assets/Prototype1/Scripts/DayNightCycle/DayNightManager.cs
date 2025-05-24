@@ -1,3 +1,4 @@
+using Assets.Prototype1.Scripts;
 using prototype1.scripts.systems;
 using System;
 using System.Collections.Generic;
@@ -50,9 +51,11 @@ public class DayNightManager : MonoBehaviour
     public void AllEnemiesSpawned()
     {
         FinishedSpawns++;
+        Debug.LogError($"{enemies.Count}");
         if(FinishedSpawns>NumberOfSpawners && enemies.Count==0)
         {
             ChangeDayState(DayStates.Day);
+            CurrencyManager.Instance.CollectDailyIncome();
         }
     }
 }
