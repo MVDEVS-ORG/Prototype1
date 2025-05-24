@@ -61,6 +61,13 @@ public class Enemy : MonoBehaviour
         if(ticks>enemyDetectionTickRate)
         {
             ticks = 0;
+            if(_sideObjective!=null && (_sideObjective as IHealthSystem).CharacterType == CharacterType.AlliedNPC)
+            {
+                agent.isStopped = false;
+                _currentDestination = _sideObjective.transform.position;
+                agent.SetDestination(_sideObjective.transform.position);
+
+            }
             if(HasNPCReachedCurrentObjective() && _currentDestination!=null)
             {
                 agent.isStopped = true;
@@ -68,6 +75,7 @@ public class Enemy : MonoBehaviour
                 if((_sideObjective as IHealthSystem).CurrentHealth <= 0)
                 {
                     _sideObjective = null;
+                    _currentDestination = _mainObjective.transform.position;
                     stateMachine.changeState(NPCState.Idle);
                 }
             }
@@ -133,9 +141,7 @@ public class Enemy : MonoBehaviour
     {
         if (provoker != null)
         {
-
-
-            if (IsObjectiveVisible(Vector3.Distance(transform.position, provoker.transform.position), CharacterType.EnemyNPC))
+            if (IsObjectiveVisible(provoker.transform.position,Vector3.Distance(transform.position, provoker.transform.position), CharacterType.AlliedNPC))
             {
                 if (provoker.TryGetComponent(out HealthSystem enemy))
                 {
@@ -151,7 +157,6 @@ public class Enemy : MonoBehaviour
 
     public void SetNPCMainObjective(HealthSystem point)
     {
-        Debug.LogError(point == null);
         _mainObjective = point;
         _currentDestination= _mainObjective.transform.position;
         //agent.SetDestination(_currentDestination);
@@ -208,7 +213,8 @@ public class Enemy : MonoBehaviour
             {
                 if (closestCollider.TryGetComponent(out HealthSystem objectiveHealth))
                 {
-                    _currentDestination = closestCollider.transform.position;
+                    if(NavMesh.SamplePosition(closestCollider.transform.position,out NavMeshHit hit,10,NavMesh.AllAreas))
+                    _currentDestination = hit.position;
                     agent.isStopped = false;
                     agent.SetDestination(_currentDestination);
                     stateMachine.changeState(NPCState.Move);
@@ -218,14 +224,14 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    private bool IsObjectiveVisible(float distanceToPlayer, CharacterType objectiveType)
+    private bool IsObjectiveVisible(Vector3 objective,float distanceToPlayer, CharacterType objectiveType)
     {
-        Vector3 direction = (_currentDestination - transform.position).normalized;
+        Vector3 direction = (objective - transform.position).normalized;
         if (Physics.Raycast(transform.position, direction, out RaycastHit hit, distanceToPlayer, obstacleMask | alliedTroopsLayerMask))
         {
-            if (hit.transform.TryGetComponent(out IHealthSystem health))
+            if (hit.transform.TryGetComponent(out HealthSystem health))
             {
-                if(health.CharacterType == objectiveType)
+                if((health as IHealthSystem).CharacterType == objectiveType)
                 {
                     return true;
                 }

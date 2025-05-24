@@ -22,6 +22,8 @@ public class EnemySpawner : MonoBehaviour
     [Header("Reference required by enemies")]
     [SerializeField] HealthSystem _playerBase;
 
+    public bool AllEnemiesSpawned = false;
+
     // revamp based on groups 
     // create a group class that can spawn say 5 enemies first then 10 after some delay the 15 and so on after delays and the groups can be mixed
     public void Start()
@@ -79,6 +81,7 @@ public class EnemySpawner : MonoBehaviour
                 }
             }
         }
+        AllEnemiesSpawned = true;
     }
 }
 
