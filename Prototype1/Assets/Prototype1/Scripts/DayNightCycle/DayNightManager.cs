@@ -14,6 +14,7 @@ public class DayNightManager : MonoBehaviour
 
     private int NumberOfSpawners = 0;
     private int FinishedSpawns = 0;
+
     private void Awake()
     {
         if (instance == null)
