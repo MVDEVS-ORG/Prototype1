@@ -1,7 +1,8 @@
+using Assets.Prototype1.Scripts.Buildings;
 using prototype1.scripts.attacks;
 using prototype1.scripts.stateMachine;
 using prototype1.scripts.systems;
-using System.Xml;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -64,6 +65,11 @@ public class Enemy : MonoBehaviour
             {
                 agent.isStopped = true;
                 stateMachine.changeState(NPCState.Attack);
+                if((_sideObjective as IHealthSystem).CurrentHealth <= 0)
+                {
+                    _sideObjective = null;
+                    stateMachine.changeState(NPCState.Idle);
+                }
             }
             else
             {
@@ -148,11 +154,12 @@ public class Enemy : MonoBehaviour
         Debug.LogError(point == null);
         _mainObjective = point;
         _currentDestination= _mainObjective.transform.position;
-        agent.SetDestination(_mainObjective.transform.position);
+        //agent.SetDestination(_currentDestination);
     }
 
     private void SearchSideObjective()
     {
+        Debug.LogError("searching for side Objective");
         Collider[] buildHits = Physics.OverlapSphere(transform.position, detectionRange, buildingLayerMask);
         if (buildHits.Length == 0 && (stateMachine.CurrentState == NPCState.Move || stateMachine.CurrentState == NPCState.Idle))
         {
@@ -162,7 +169,16 @@ public class Enemy : MonoBehaviour
         }
         else
         {
-            SetPlayerDestination(buildHits);
+            List<Collider> completeBuildColliders = new();
+            foreach(Collider buildingCollider in buildHits)
+            {
+                Building building = buildingCollider.GetComponent<Building>();
+                if((building as IBuildingSystem).State == BuildingState.Completed)
+                {
+                    completeBuildColliders.Add(buildingCollider);
+                }
+            }
+            SetPlayerDestination(completeBuildColliders.ToArray());
         }
 
     }

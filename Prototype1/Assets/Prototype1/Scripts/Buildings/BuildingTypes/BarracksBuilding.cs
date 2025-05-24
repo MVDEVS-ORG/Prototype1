@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using prototype1.scripts.systems;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Prototype1.Scripts.Buildings
@@ -27,9 +28,12 @@ namespace Assets.Prototype1.Scripts.Buildings
 
         private float troopCheckInterval = 5f;
         private float lastCheckTime;
+        private HealthSystem _selfHealthSystem;
 
         private void Start()
         {
+            _selfHealthSystem = GetComponent<HealthSystem>();
+            _selfHealthSystem.OnZeroHealth += Die;
             BuildingType = BuildingTypes.Barracks;
             maxUpgradeLimit = 3;
             SetInitialValues();
@@ -41,6 +45,7 @@ namespace Assets.Prototype1.Scripts.Buildings
             UpgradeCost = 15;
             CurrentType = BarracksUpgradeType.Gunner;
             CanBeUpgraded = true;
+            (_selfHealthSystem as IHealthSystem).ResetHealth();
         }
 
         public override void Build()
@@ -171,19 +176,13 @@ namespace Assets.Prototype1.Scripts.Buildings
             }
         }
 
-        public override void TakeDamage(int damage)
+        void Die()
         {
-            if (State != BuildingState.Completed) return;
-
-            currentHealth -= damage;
-            if (currentHealth <= 0)
-            {
-                State = BuildingState.Ruined;
-                if (m_Renderer != null)
-                    m_Renderer.material.color = Color.gray;
-
-                Debug.Log("Barracks destroyed!");
-            }
+            State = BuildingState.Ruined;
+            if (m_Renderer != null)
+                m_Renderer.material.color = Color.gray;
+            _selfHealthSystem.OnZeroHealth -= Die;
+            Debug.Log("Barracks destroyed!");
         }
     }
 }

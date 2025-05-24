@@ -54,7 +54,7 @@ public class EnemySpawner : MonoBehaviour
                     int NumberOfAttempts = 0;
                     while (numberOfEnemies > 0)
                     {
-                        if (NumberOfAttempts > 5)
+                        if (NumberOfAttempts > 20)
                         {
                             break;
                         }
@@ -66,7 +66,8 @@ public class EnemySpawner : MonoBehaviour
                         Vector3 randomPoint = transform.position + new Vector3(rngInCircle.x, transform.position.y, rngInCircle.y);
                         if (NavMesh.SamplePosition(randomPoint, out NavMeshHit pointFound, 2f, NavMesh.AllAreas))
                         {
-                            Enemy enemies = Instantiate(_enemyPref[enemyType.Key], pointFound.position, Quaternion.identity).GetComponent<Enemy>();
+                            GameObject enemyObj = Instantiate(_enemyPref[enemyType.Key], pointFound.position, Quaternion.identity);
+                            Enemy enemies = enemyObj.GetComponent<Enemy>();
                             enemies.SetNPCMainObjective(_playerBase);
                             numberOfEnemies--;
                         }

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using prototype1.scripts.systems;
+using UnityEngine;
 
 namespace Assets.Prototype1.Scripts.Buildings
 {
@@ -18,9 +19,12 @@ namespace Assets.Prototype1.Scripts.Buildings
         private bool isAnimatingDoor = false;
         private Vector3 doorClosedPos;
         private Vector3 doorOpenPos;
+        private HealthSystem _selfHealthSystem;
 
         private void Start()
         {
+            _selfHealthSystem = GetComponent<HealthSystem>();
+            _selfHealthSystem.OnZeroHealth += Die;
             SetInitialValues();
 
             if (door != null)
@@ -36,6 +40,7 @@ namespace Assets.Prototype1.Scripts.Buildings
             UpgradeCost = 10;
             CanBeUpgraded = true;
             isDoorOpen = false;
+            (_selfHealthSystem as IHealthSystem).ResetHealth();
         }
 
         public override void Build()
@@ -68,22 +73,17 @@ namespace Assets.Prototype1.Scripts.Buildings
             CanBeUpgraded = false;
         }
 
-        public override void TakeDamage(int damage)
+        void Die()
         {
-            if (State != BuildingState.Completed) return;
+            State = BuildingState.Ruined;
 
-            currentHealth -= damage;
-            if (currentHealth <= 0)
+            foreach (GameObject wall in Walls)
             {
-                State = BuildingState.Ruined;
-
-                foreach (GameObject wall in Walls)
-                {
-                    wall.GetComponent<Renderer>().material.color = Color.gray;
-                }
-
-                Debug.Log("Wall destroyed!");
+                wall.GetComponent<Renderer>().material.color = Color.gray;
             }
+
+            Debug.Log("Wall destroyed!");
+            _selfHealthSystem.OnZeroHealth -= Die;
         }
 
         protected override void Update()

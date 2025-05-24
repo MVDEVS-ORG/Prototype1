@@ -13,6 +13,8 @@ namespace prototype1.scripts.systems
         public Action OnZeroHealth;
         CharacterType IHealthSystem.CharacterType => _characterType;
 
+        public int CurrentHealth => _currentHealth;
+
         void IHealthSystem.ResetHealth()
         {
             _currentHealth = _maxHealth;

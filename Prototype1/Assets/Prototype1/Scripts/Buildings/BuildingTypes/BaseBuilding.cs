@@ -1,4 +1,5 @@
-﻿using System;
+﻿using prototype1.scripts.systems;
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -6,8 +7,10 @@ namespace Assets.Prototype1.Scripts.Buildings
 {
     public class BaseBuilding : Building
     {
+        private HealthSystem _selfHealthSystem;
         private void Start()
         {
+            _selfHealthSystem = GetComponent<HealthSystem>();
             SetInitialValues();
         }
 
@@ -23,6 +26,18 @@ namespace Assets.Prototype1.Scripts.Buildings
             if (m_Renderer != null)
                 m_Renderer.material.color = Color.green;
             Debug.Log("Base Building initialized in completes State");
+            (_selfHealthSystem as IHealthSystem).ResetHealth();
+            _selfHealthSystem.OnZeroHealth += Die;
+        }
+
+        void Die()
+        {
+            State = BuildingState.Ruined;
+
+            m_Renderer.material.color = Color.gray;
+
+            Debug.Log("Base destroyed!");
+            _selfHealthSystem.OnZeroHealth -= Die;
         }
 
         public override void Build()
@@ -57,21 +72,6 @@ namespace Assets.Prototype1.Scripts.Buildings
             {
                 CanBeUpgraded = false;
                 Debug.LogError("Base reached max Upgrade Level");
-            }
-        }
-        public override void TakeDamage(int damage)
-        {
-            if (State != BuildingState.Completed) return;
-
-            currentHealth -= damage;
-
-            if (currentHealth <= 0)
-            {
-                State = BuildingState.Ruined;
-                if (m_Renderer != null)
-                    m_Renderer.material.color = Color.gray;
-                //TODO: make Sure the Game is over at this Point.
-                Debug.Log("Base destroyed!");
             }
         }
     }

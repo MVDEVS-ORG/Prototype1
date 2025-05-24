@@ -17,7 +17,7 @@ public class RangedAttackPrefabScript : MonoBehaviour
         switch (selfType)
         {
             case CharacterType.EnemyNPC:
-                if (enemy.CharacterType == CharacterType.Player || enemy.CharacterType == CharacterType.AlliedNPC)
+                if (enemy.CharacterType == CharacterType.Player || enemy.CharacterType == CharacterType.AlliedNPC || enemy.CharacterType == CharacterType.AliedBuildings)
                 {
                     enemy?.TakeDamage(_damage,attacker);
                 }
