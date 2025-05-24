@@ -21,12 +21,16 @@ namespace Assets.Prototype1.Scripts.Buildings
         {
             if (State == BuildingState.Ruined)
             {
-                State = BuildingState.Completed;
-                currentUpgrade = 1;
-                if (m_Renderer != null)
-                    m_Renderer.material.color = Color.blue;
-                GetComponent<IHealthSystem>().ResetHealth();
-                Debug.Log($"{name} built successfully!");
+                bool costReduced = CurrencyManager.Instance.SpendCurrency(BuildCost);
+                if (costReduced)
+                {
+                    State = BuildingState.Completed;
+                    currentUpgrade = 1;
+                    if (m_Renderer != null)
+                        m_Renderer.material.color = Color.blue;
+                    GetComponent<IHealthSystem>().ResetHealth();
+                    Debug.Log($"{name} built successfully!");
+                }
             }
         }
 

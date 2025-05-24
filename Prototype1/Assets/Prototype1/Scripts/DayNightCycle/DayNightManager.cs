@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class DayNightManager : MonoBehaviour
@@ -7,6 +8,7 @@ public class DayNightManager : MonoBehaviour
 
     public static event Action<DayStates> OnDayStateChanged;
     public static DayStates CurrentDayState = DayStates.Day;
+
     private void Awake()
     {
         if (instance == null)
