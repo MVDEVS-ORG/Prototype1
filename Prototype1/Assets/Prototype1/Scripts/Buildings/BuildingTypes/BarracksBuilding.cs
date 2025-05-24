@@ -181,7 +181,7 @@ namespace Assets.Prototype1.Scripts.Buildings
             State = BuildingState.Ruined;
             if (m_Renderer != null)
                 m_Renderer.material.color = Color.gray;
-
+            _selfHealthSystem.OnZeroHealth -= Die;
             Debug.Log("Barracks destroyed!");
         }
     }
