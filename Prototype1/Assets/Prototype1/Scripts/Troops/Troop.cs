@@ -28,6 +28,7 @@ public class Troop : MonoBehaviour
     private GameObject _targetEnemy;
     private INPCAttack _npcAttack;
     private float _lastAttackTime = 0f;
+    private HealthSystem _healthSystem;
 
     public CharacterType CharacterType => CharacterType.AlliedNPC;
 
@@ -46,6 +47,8 @@ public class Troop : MonoBehaviour
         _npcAttack = GetComponent<INPCAttack>();
         _rend.material.color = defaultColor;
         ApplyStatsByType();
+        _healthSystem = GetComponent<HealthSystem>();
+        _healthSystem.OnZeroHealth += Die;
     }
 
     void Update()
@@ -91,6 +94,12 @@ public class Troop : MonoBehaviour
     {
         _agent.isStopped = false;
         _agent.SetDestination(position);
+    }
+
+    private void Die()
+    {
+        _healthSystem.OnZeroHealth -= Die;
+        Destroy(gameObject);
     }
 
     private void AcquireAndAttack()

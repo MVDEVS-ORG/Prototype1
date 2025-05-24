@@ -21,6 +21,7 @@ public class AttackPrefabScript : MonoBehaviour
         Debug.LogError(other.gameObject.name + "this is what we are looking for");
         if (other.TryGetComponent(out HealthSystem enemy))
         {
+            Debug.LogError($"allied collider {other.transform.name} was hit and the collider had {(enemy as IHealthSystem).CharacterType}");
             IHealthSystem enemyHealth = enemy;
             switch (_selfCharacterType)
             {
