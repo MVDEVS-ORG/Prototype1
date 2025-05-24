@@ -132,6 +132,7 @@ public class Enemy : MonoBehaviour
 
     private void Die()
     {
+        DayNightManager.instance?.enemies.Remove(this);
         _selfHealth.OnDamaged -= AttackIfProvoked;
         _selfHealth.OnZeroHealth -= Die;   
         Destroy(gameObject);
