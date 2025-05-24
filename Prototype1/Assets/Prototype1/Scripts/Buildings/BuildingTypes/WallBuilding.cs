@@ -15,6 +15,8 @@ namespace Assets.Prototype1.Scripts.Buildings
         public GameObject[] Walls;
         public GameObject door;
 
+        [SerializeField] private Collider _doorCollider;
+        [SerializeField] private Collider[] _wallColliders;
         private bool isDoorOpen = false;
         private bool isAnimatingDoor = false;
         private Vector3 doorClosedPos;
@@ -26,7 +28,11 @@ namespace Assets.Prototype1.Scripts.Buildings
             _selfHealthSystem = GetComponent<HealthSystem>();
             _selfHealthSystem.OnZeroHealth += Die;
             SetInitialValues();
-
+            foreach (Collider col in _wallColliders)
+            {
+                col.enabled = false;
+            }
+            _doorCollider.enabled = false;
             if (door != null)
             {
                 doorClosedPos = door.transform.position;
@@ -39,6 +45,7 @@ namespace Assets.Prototype1.Scripts.Buildings
             BuildCost = 7;
             UpgradeCost = 10;
             CanBeUpgraded = true;
+            _doorCollider.enabled = false;
             isDoorOpen = false;
             (_selfHealthSystem as IHealthSystem).ResetHealth();
         }
@@ -55,7 +62,11 @@ namespace Assets.Prototype1.Scripts.Buildings
                     wall.SetActive(true);
                     wall.GetComponent<Renderer>().material.color = Color.blue;
                 }
-
+                foreach (Collider col in _wallColliders)
+                {
+                    col.enabled = true;
+                }
+                _doorCollider.enabled = true;
                 Debug.Log($"{name} built successfully!");
             }
         }
@@ -79,9 +90,14 @@ namespace Assets.Prototype1.Scripts.Buildings
 
             foreach (GameObject wall in Walls)
             {
+                wall.SetActive(false);
                 wall.GetComponent<Renderer>().material.color = Color.gray;
             }
-
+            foreach (Collider col in _wallColliders)
+            {
+                col.enabled = false;
+            }
+            _doorCollider.enabled = false;
             Debug.Log("Wall destroyed!");
             _selfHealthSystem.OnZeroHealth -= Die;
         }
@@ -117,6 +133,7 @@ namespace Assets.Prototype1.Scripts.Buildings
 
             door.transform.position = end;
             isDoorOpen = !isDoorOpen;
+            _doorCollider.enabled = !_doorCollider.enabled;
             isAnimatingDoor = false;
         }
     }

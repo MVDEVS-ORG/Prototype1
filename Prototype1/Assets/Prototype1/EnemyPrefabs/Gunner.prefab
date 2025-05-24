@@ -176,8 +176,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 869f06e3816496f448285cfb40844185, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxHealth: 100
-  _currentHealth: 100
+  _maxHealth: 60
+  _currentHealth: 60
   _characterType: 2
 --- !u!114 &4943988685032500427
 MonoBehaviour:
@@ -193,6 +193,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _animationTime: 2
   _attackPrefab: {fileID: 6560967314567969909, guid: c825b5434a0620d4dac4416b01a1c766, type: 3}
+  _damage: 30
 --- !u!54 &1090355602542760574
 Rigidbody:
   m_ObjectHideFlags: 0

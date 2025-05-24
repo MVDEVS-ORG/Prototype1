@@ -7,9 +7,10 @@ public class RangedAttackPrefabScript : MonoBehaviour
     [SerializeField] private int _damage;
     private GameObject attacker;
 
-    public void SetParameters(GameObject sender)
+    public void SetParameters(GameObject sender, int damage)
     {
         attacker = sender;
+        _damage = damage;
     }
 
     public void DamageEnemy(IHealthSystem enemy, CharacterType selfType)

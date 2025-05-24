@@ -177,8 +177,7 @@ public class Enemy : MonoBehaviour
             List<Collider> completeBuildColliders = new();
             foreach(Collider buildingCollider in buildHits)
             {
-                Building building = buildingCollider.GetComponent<Building>();
-                if((building as IBuildingSystem).State == BuildingState.Completed)
+                if(buildingCollider.TryGetComponent(out IBuildingSystem building) && building.State == BuildingState.Completed)
                 {
                     completeBuildColliders.Add(buildingCollider);
                 }
