@@ -1,6 +1,7 @@
 using Assets.Prototype1.Scripts;
 using prototype1.scripts.systems;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,6 +16,7 @@ public class DayNightManager : MonoBehaviour
 
     private int NumberOfSpawners = 0;
     private int FinishedSpawns = 0;
+    private Coroutine _dayShift;
 
     private void Awake()
     {
@@ -51,12 +53,25 @@ public class DayNightManager : MonoBehaviour
     public void AllEnemiesSpawned()
     {
         FinishedSpawns++;
-        Debug.LogError($"{enemies.Count}");
-        if(FinishedSpawns>NumberOfSpawners && enemies.Count==0)
+        if(FinishedSpawns>=NumberOfSpawners)
         {
-            ChangeDayState(DayStates.Day);
-            CurrencyManager.Instance.CollectDailyIncome();
+            if(_dayShift!=null)
+            {
+                StopCoroutine(_dayShift);
+                _dayShift = null;
+            }
+            _dayShift = StartCoroutine(CheckIfDayShiftPossible());
         }
+    }
+
+    private IEnumerator CheckIfDayShiftPossible()
+    {
+        while(enemies.Count != 0)
+        {
+            yield return new WaitForEndOfFrame();
+        }
+        ChangeDayState(DayStates.Day);
+        CurrencyManager.Instance.CollectDailyIncome();
     }
 }
 
