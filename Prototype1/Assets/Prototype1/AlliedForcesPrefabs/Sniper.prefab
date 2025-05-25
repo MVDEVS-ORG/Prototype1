@@ -126,14 +126,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5613e57bc9e5a474380d9f9b007e2c32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  troopType: 0
-  attackRange: 100
+  troopType: 1
+  attackRange: 200
   mobility: 3
   defaultColor: {r: 0.7993573, g: 1, b: 0, a: 1}
   selectedColor: {r: 0, g: 0.060203552, b: 1, a: 1}
   detectDistance: 200
-  attackCooldown: 3
+  attackCooldown: 4
   _isSelected: 0
+  _enemyLayerMask:
+    serializedVersion: 2
+    m_Bits: 3072
 --- !u!114 &7284105300499556458
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -146,8 +149,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 869f06e3816496f448285cfb40844185, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxHealth: 100
-  _currentHealth: 100
+  _maxHealth: 40
+  _currentHealth: 40
   _characterType: 1
 --- !u!114 &1342672528189421926
 MonoBehaviour:
@@ -163,6 +166,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _animationTime: 2
   _attackPrefab: {fileID: 6560967314567969909, guid: c825b5434a0620d4dac4416b01a1c766, type: 3}
+  _damage: 60
 --- !u!136 &-2192448928867333144
 CapsuleCollider:
   m_ObjectHideFlags: 0

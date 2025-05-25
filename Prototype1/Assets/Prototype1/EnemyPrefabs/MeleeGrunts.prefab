@@ -192,3 +192,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _animationTime: 0.287
   _attackPrefab: {fileID: 8425005839871767564, guid: 4e9c49c2681cbd744af2739aeb9385f4, type: 3}
+  _damage: 30

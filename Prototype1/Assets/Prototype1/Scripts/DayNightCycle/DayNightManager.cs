@@ -1,3 +1,4 @@
+using Assets.Prototype1.Scripts;
 using prototype1.scripts.systems;
 using System;
 using System.Collections;
@@ -70,6 +71,7 @@ public class DayNightManager : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         ChangeDayState(DayStates.Day);
+        CurrencyManager.Instance.CollectDailyIncome();
     }
 }
 

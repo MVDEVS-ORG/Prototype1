@@ -11,6 +11,7 @@ namespace prototype1.scripts.attacks
         [SerializeField] RangedAttackPrefabScript _attackPrefab;
         Coroutine _attackCoroutine;
         IHealthSystem _healthSystem;
+        [SerializeField] private int _damage;
 
         private void Start()
         {
@@ -31,7 +32,7 @@ namespace prototype1.scripts.attacks
             
             RangedAttackPrefabScript attack = Instantiate(_attackPrefab.gameObject, transform).GetComponent<RangedAttackPrefabScript>();
             yield return new WaitForSeconds(_animationTime);
-            attack.SetParameters(gameObject);
+            attack.SetParameters(gameObject, _damage);
             attack.DamageEnemy(enemy, _healthSystem.CharacterType);
             Destroy(attack.gameObject);
             _attackCoroutine = null;
